@@ -614,279 +614,55 @@ button{ -webkit-tap-highlight-color:transparent; }
 
 
 /* ===== REVISÃO DE LAYOUT: espaçamento, sobreposição e painel de pontos ===== */
-CSS
 
-
-/* ==========================================================================
-   MELHORIA DE LAYOUT, HUD, STATUS E ESTRUTURA
-   ========================================================================== */
-
-/* 1. Base e Estrutura Principal */
-html, body {
-  width: 100vw;
-  height: 100vh;
-  height: 100dvh;
-  min-height: 100%;
-  overflow: hidden;
+html, body { width:100%; height:100%; min-height:100%; overflow:hidden; }
+#game-screen { isolation:isolate; }
+.scene { overflow-y:auto; overflow-x:hidden; justify-content:flex-start; gap:14px; padding-bottom:28px; }
+.scene > * { flex-shrink:0; }
+.scene::before { pointer-events:none; }
+#immersive-hud { position:absolute; top:10px; left:10px; right:10px; display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:start; gap:10px; }
+.hud-chip { max-width:100%; width:max-content; }
+.hud-actions { justify-content:flex-end; max-width:min(70vw,720px); }
+#player-status { top:58px; left:10px; width:min(460px,calc(100% - 20px)); padding:10px 12px; }
+#player-status .status-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+#player-status .status-grid > div { min-width:0; padding:7px 8px; background:rgba(30,41,59,.55); border:1px solid rgba(148,163,184,.22); border-radius:9px; }
+#player-status .stat-label { align-items:center; flex-wrap:wrap; font-size:.68rem; }
+#player-status .stat-label b { color:#fef3c7; font-size:.82rem; }
+#player-status .status-bottom { justify-content:flex-start; gap:8px 14px; font-size:.66rem; }
+#player-status .status-bottom span:first-child { color:#fecaca; }
+#consequence-toast { top:178px; z-index:60; }
+#game-overlay { z-index:80; overflow-y:auto; }
+.overlay-card { max-height:calc(100dvh - 32px); overscroll-behavior:contain; }
+.roster { display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:8px; }
+.roster button { min-width:0; min-height:42px; line-height:1.25; overflow-wrap:anywhere; }
+.roster button:disabled { opacity:.42; cursor:not-allowed; filter:grayscale(.7); }
+.roster button.locked-choice { border-color:#fbbf24; box-shadow:inset 0 0 0 1px #fbbf2466; }
+.roster-lock-note { margin:8px 0; padding:10px 12px; border:1px solid #fbbf24; border-radius:10px; background:rgba(120,53,15,.25); color:#fef3c7; font-size:.78rem; line-height:1.45; }
+#player-status .status-grid > div:last-child { background:linear-gradient(135deg,rgba(76,29,149,.55),rgba(30,41,59,.7)); border-color:#a78bfa; }
+#player-status .status-grid > div:last-child .stat-label b { color:#ddd6fe; font-size:1rem; }
+#player-status .status-grid > div:last-child .stat-track { height:7px; }
+.status-points-caption { display:block; margin-top:4px; color:#c4b5fd; font-size:.58rem; }
+@media(max-width:750px) {
+ #immersive-hud { top:6px; left:6px; right:6px; grid-template-columns:1fr; gap:5px; }
+ .hud-chip { max-width:100%; font-size:.62rem; }
+ .hud-actions { max-width:100%; justify-content:flex-start; gap:5px; }
+ .hud-actions button { font-size:.62rem; padding:7px 9px; }
+ #player-status { top:76px; left:6px; width:calc(100% - 12px); max-height:none; overflow:visible; padding:7px; }
+ #player-status .status-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:5px; }
+ #player-status .status-grid > div { padding:5px 7px; }
+ #player-status .status-bottom { gap:4px 10px; font-size:.58rem; }
+ #consequence-toast { top:220px; }
+ .scene { padding:210px 12px 20px!important; gap:12px; }
+ .overlay-card { width:100%; max-height:calc(100dvh - 16px); padding:13px; }
+ .roster { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ .roster button { font-size:.72rem; }
+}
+@media(max-width:380px) {
+ .scene { padding-top:228px!important; }
+ .hud-actions button { font-size:.57rem; padding:6px 7px; }
 }
 
-#game-screen {
-  isolation: isolate;
-}
 
-.scene {
-  overflow-y: auto;
-  overflow-x: hidden;
-  justify-content: flex-start;
-  gap: 14px;
-  padding-bottom: 28px;
-  overscroll-behavior-y: contain;
-  -webkit-overflow-scrolling: touch;
-}
-
-.scene > * {
-  flex-shrink: 0;
-}
-
-.scene::before {
-  pointer-events: none;
-}
-
-/* 2. HUD Imersivo */
-#immersive-hud {
-  position: absolute;
-  top: max(10px, env(safe-area-inset-top));
-  left: 10px;
-  right: 10px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: start;
-  gap: 10px;
-  z-index: 30;
-}
-
-.hud-chip {
-  max-width: 100%;
-  width: max-content;
-}
-
-.hud-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  max-width: min(70vw, 720px);
-}
-
-/* 3. Painel de Status do Jogador */
-#player-status {
-  position: absolute;
-  top: 58px;
-  left: 10px;
-  width: min(460px, calc(100% - 20px));
-  padding: 10px 12px;
-  z-index: 25;
-}
-
-#player-status .status-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-}
-
-#player-status .status-grid > div {
-  min-width: 0;
-  padding: 7px 8px;
-  background: rgba(30, 41, 59, 0.55);
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  border-radius: 9px;
-}
-
-#player-status .status-grid > div:last-child {
-  background: linear-gradient(135deg, rgba(76, 29, 149, 0.55), rgba(30, 41, 59, 0.7));
-  border-color: #a78bfa;
-}
-
-#player-status .stat-label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  font-size: 0.68rem;
-}
-
-#player-status .stat-label b {
-  color: #fef3c7;
-  font-size: 0.82rem;
-}
-
-#player-status .status-grid > div:last-child .stat-label b {
-  color: #ddd6fe;
-  font-size: 1rem;
-}
-
-#player-status .status-grid > div:last-child .stat-track {
-  height: 7px;
-}
-
-.status-points-caption {
-  display: block;
-  margin-top: 4px;
-  color: #c4b5fd;
-  font-size: 0.58rem;
-}
-
-#player-status .status-bottom {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px 14px;
-  font-size: 0.66rem;
-}
-
-#player-status .status-bottom span:first-child {
-  color: #fecaca;
-}
-
-/* 4. Notificações e Overlays */
-#consequence-toast {
-  position: absolute;
-  top: 178px;
-  z-index: 60;
-}
-
-#game-overlay {
-  z-index: 80;
-  overflow-y: auto;
-}
-
-.overlay-card {
-  max-height: calc(100dvh - 32px);
-  overscroll-behavior: contain;
-}
-
-/* 5. Seleção de Elenco / Personagens (Roster) */
-.roster {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-  gap: 8px;
-}
-
-.roster button {
-  min-width: 0;
-  min-height: 42px;
-  line-height: 1.25;
-  overflow-wrap: anywhere;
-}
-
-.roster button:disabled {
-  opacity: 0.42;
-  cursor: not-allowed;
-  filter: grayscale(0.7);
-}
-
-.roster button.locked-choice {
-  border-color: #fbbf24;
-  box-shadow: inset 0 0 0 1px rgba(251, 191, 36, 0.4);
-}
-
-.roster-lock-note {
-  margin: 8px 0;
-  padding: 10px 12px;
-  border: 1px solid #fbbf24;
-  border-radius: 10px;
-  background: rgba(120, 53, 15, 0.25);
-  color: #fef3c7;
-  font-size: 0.78rem;
-  line-height: 1.45;
-}
-
-/* ==========================================================================
-   RESPONSIVIDADE (DISPOSITIVOS MÓVEIS)
-   ========================================================================== */
-@media (max-width: 750px) {
-  #immersive-hud {
-    top: max(6px, env(safe-area-inset-top));
-    left: 6px;
-    right: 6px;
-    grid-template-columns: 1fr;
-    gap: 5px;
-  }
-
-  .hud-chip {
-    max-width: 100%;
-    font-size: 0.62rem;
-  }
-
-  .hud-actions {
-    max-width: 100%;
-    justify-content: flex-start;
-    gap: 5px;
-  }
-
-  .hud-actions button {
-    font-size: 0.62rem;
-    padding: 7px 9px;
-  }
-
-  #player-status {
-    top: 76px;
-    left: 6px;
-    width: calc(100% - 12px);
-    max-height: none;
-    overflow: visible;
-    padding: 7px;
-  }
-
-  #player-status .status-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 5px;
-  }
-
-  #player-status .status-grid > div {
-    padding: 5px 7px;
-  }
-
-  #player-status .status-bottom {
-    gap: 4px 10px;
-    font-size: 0.58rem;
-  }
-
-  #consequence-toast {
-    top: 220px;
-  }
-
-  .scene {
-    padding: 210px 12px 20px !important;
-    gap: 12px;
-  }
-
-  .overlay-card {
-    width: 100%;
-    max-height: calc(100dvh - 16px);
-    padding: 13px;
-  }
-
-  .roster {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .roster button {
-    font-size: 0.72rem;
-  }
-}
-
-@media (max-width: 380px) {
-  .scene {
-    padding-top: 228px !important;
-  }
-
-  .hud-actions button {
-    font-size: 0.57rem;
-    padding: 6px 7px;
-  }
-}
 
 /* === MANUAL INICIAL E ESCOLHA DE PERSONAGEM === */
 .onboarding-scene{justify-content:flex-start;gap:16px;padding:30px 20px 28px;overflow-y:auto;}
